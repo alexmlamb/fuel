@@ -542,8 +542,13 @@ class H5PYDataset(Dataset):
             data, shapes = self._out_of_memory_get_data(state, request)
         for i in range(len(data)):
             if shapes[i] is not None:
-                for j in range(len(data[i])):
-                    data[i][j] = data[i][j].reshape(shapes[i][j])
+                if shapes[i].shape == (3,):
+                    # This is just a single example
+                    data[i] = data[i].reshape(shapes[i])
+                else:
+                    # This is a batch of images
+                    for j in range(len(data[i])):
+                        data[i][j] = data[i][j].reshape(shapes[i][j])
         return tuple(data)
 
     def _in_memory_get_data(self, state=None, request=None):
